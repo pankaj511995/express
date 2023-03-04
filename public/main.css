@@ -1,0 +1,19 @@
+.nev-bar{
+    background-color: aqua;
+    height: 3rem;
+    
+}
+.list-bar{
+    display: flexbox;
+    margin: 0.5rem;
+}
+.list-item{
+    margin: 1rem;
+text-justify: auto;
+padding-top: 1rem;
+    display: flex;
+}
+.send{
+    background-color: aqua;
+    
+}
