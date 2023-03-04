@@ -1,20 +1,25 @@
-const express=require('express')
-const path=require('path')
-const bodyparser=require('body-parser')
-const adminproduct=require('./router/admin')
-const shopProduct=require('./router/shop')
-const contact=require('./router/contactus')
-const error404=require('./router/error')
-const app=express()
-app.use(bodyparser.urlencoded())
-app.use(express.static(path.join(__dirname,'public')))
+const path = require('path');
 
-app.use('/admin',adminproduct)
-app.use('/shop',shopProduct)
-app.use('/contactus',contact)
-app.post('/success',(req,res)=>{
-    res.send(`<h1>status success name is ${req.body.name} and email is ${req.body.email}</h1>`)
-})
-app.use(error404)
+const express = require('express');
+const bodyParser = require('body-parser');
 
-app.listen(3000)
+const app = express();
+
+app.set('view engine', 'ejs');
+app.set('views', 'views');
+
+const adminData = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
+const contactRoter=require('./routes/contact')
+const error404=require('./controller/error')
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/admin', adminData.routes);
+app.use(shopRoutes);
+app.use('/contactus',contactRoter);
+
+app.use(error404.error404set)
+
+app.listen(3000);
