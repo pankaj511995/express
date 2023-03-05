@@ -1,9 +1,9 @@
 const Product = require('../models/product');
 const Cart=require('../models/cart')
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll(products => {
+  Product.fetchAll().then(products => {
     res.render('shop/product-list', {
-      prods: products,
+      prods: products[0],
       pageTitle: 'All Products',
       path: '/products'
     });
@@ -19,9 +19,9 @@ exports.detailsitem=(req,res,next)=>{
   })
 }
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll(products => {
+  Product.fetchAll().then(products => {
     res.render('shop/index', {
-      prods: products,
+      prods: products[0],
       pageTitle: 'Shop',
       path: '/'
     });
