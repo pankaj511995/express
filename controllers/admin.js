@@ -16,31 +16,29 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(title, imageUrl, description, price);
-  product.save().then(()=>{
-    res.redirect('/');
-  }).catch(err=>console.log(err,'while saving in admin'))
- 
+  Product.create({title:title, imageUrl,imageUrl, description:description, price:price})
+  .then(()=>res.redirect('/'))
+  .catch(e=>console.log('error creating new product '))
 };
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll().then(products => {
+  Product.findAll().then(products => {
     res.render('admin/products', {
-      prods: products[0],
+      prods: products,
       pageTitle: 'Admin Products',
       path: '/admin/products'
     });
   });
 };
 exports.editProduct=(req,res)=>{
-  Product.findByID(req.params.productid).then(product=>{
+  Product.findByPk(req.params.productid).then(product=>{
     res.render('admin/edit-product', {
-      product: product[0][0],
+      product: product,
       pageTitle: 'Admin Products',
       path: '/admin/products',
       editing:req.query.edit
     });
-    console.log(product[0][0],'got editing product')
+    
   })
 }
 exports.posteditProduct= (req, res, next) => {
@@ -48,11 +46,11 @@ exports.posteditProduct= (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(title, imageUrl, description, price);
-  product.update(req.params.productid);
-  res.redirect('/');
+  Product.update({title:title, imageUrl,imageUrl, description:description, price:price},{where :{id:req.params.productid}})
+  .then(()=>res.redirect('/'))
+  .catch(e=>console.log('error while updating'))
 };
 exports.postDeleteProduct=(req,res)=>{
-  Product.delete(req.params.productid)
+  Product.destroy({where:{id:req.params.productid}})
   res.redirect('/')
 }
