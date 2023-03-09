@@ -16,13 +16,13 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  Product.create({title:title, imageUrl,imageUrl, description:description, price:price})
+  req.user.createProduct({title:title, imageUrl,imageUrl, description:description, price:price})
   .then(()=>res.redirect('/'))
   .catch(e=>console.log('error creating new product '))
-};
+}; 
 
 exports.getProducts = (req, res, next) => {
-  Product.findAll().then(products => {
+req.user.getProducts().then(products => {
     res.render('admin/products', {
       prods: products,
       pageTitle: 'Admin Products',
@@ -31,9 +31,9 @@ exports.getProducts = (req, res, next) => {
   });
 };
 exports.editProduct=(req,res)=>{
-  Product.findByPk(req.params.productid).then(product=>{
+  req.user.getProducts({where:{id:req.params.productid}}).then(product=>{
     res.render('admin/edit-product', {
-      product: product,
+      product: product[0],
       pageTitle: 'Admin Products',
       path: '/admin/products',
       editing:req.query.edit
@@ -46,11 +46,11 @@ exports.posteditProduct= (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  Product.update({title:title, imageUrl,imageUrl, description:description, price:price},{where :{id:req.params.productid}})
+  Product.update({title:title, imageUrl,imageUrl, description:description, price:price},{where :{id:req.params.productid,userId:req.user.id}})
   .then(()=>res.redirect('/'))
   .catch(e=>console.log('error while updating'))
 };
 exports.postDeleteProduct=(req,res)=>{
-  Product.destroy({where:{id:req.params.productid}})
-  res.redirect('/')
+  Product.destroy({where:{id:req.params.productid,userId:req.user.id}})
+  res.redirect('/admin/products')
 }
