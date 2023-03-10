@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const User=require('./models/user')
 const Product=require('./models/product')
 const Cart=require('./models/cart')
-const cartItem=require('./models/cartItem')
+const cartItem=require('./models/cartitem')
 const errorController = require('./controllers/error');
 // const sequelize=require('./models/product')
 const sequelize=require('./util/database')
@@ -29,22 +29,23 @@ app.use((req,res,next)=>{
 
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
+app.use(errorController.get404);
 
 User.hasMany(Product)
-Product.belongsTo(User,{constraints:true,onDelete:'CASCADE'})
+Product.belongsTo(User,{onDelete:'CASCADE'})
 User.hasMany(Cart)
 Cart.belongsTo(User)
 Cart.belongsToMany(Product,{through:cartItem})
 Product.belongsToMany(Cart,{through:cartItem})
 
-app.use(errorController.get404);
-// sequelize.sync({force:true}).then(()=>User.findByPk(1)).then((user)=>{
-//     if(!user){
-//         return User.create({name:'pankaj',email:'@gmail.com'})
-//     }
-//     return user
-    
-// }).then((user)=>{
+
+sequelize.sync({force:false}).then(()=>User.findByPk(1)).then((user)=>{
+    if(!user){
+        return User.create({name:'pankaj',email:'@gmail.com'})
+    }
+    return user
+     
+}).then((user)=>{
     app.listen(3000);
-// }).catch(e=>console.log('table not creaded',e))
+}).catch(e=>console.log('table not creaded',e))
 

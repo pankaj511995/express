@@ -1,5 +1,6 @@
 const Product = require('../models/product');
 const Cart=require('../models/cart')
+const User=require('../models/user')
 exports.getProducts = (req, res, next) => {
   Product.findAll().then(products => {
     res.render('shop/product-list', {
@@ -29,18 +30,18 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  res.render('shop/cart', {
-    path: '/cart',
-    pageTitle: 'Your Cart'
-  });
-};
-exports.postCart=(req,res,next)=>{
-  const pro=req.body.productid
-  Product.findByID(pro,(product)=>{
-    Cart.addProduct(pro,product.price)
+  req.user.getCarts().then(cart=>{
+    return cart.getProducts()
+  }).then(products=>{
+    res.render('shop/cart', {
+        path: '/cart',
+        prods: products,
+        pageTitle: 'Your Cart'  
+      })
+   
   })
+};
 
-}
 exports.getOrders = (req, res, next) => {
   res.render('shop/orders', {
     path: '/orders',
@@ -54,3 +55,23 @@ exports.getCheckout = (req, res, next) => {
     pageTitle: 'Checkout'
   });
 };
+
+exports.postCart=(req,res)=>{
+  const id=req.body.productid;
+  let qty=1;
+  let fetchcart;
+  req.user.getCarts().then(cart=>{
+    fetchcart=cart
+   return cart.getProducts({where :{id:id}})})
+  .then(product=>{
+   if(product.length>0){
+    qty=product[0].cartItme.quantity+1
+   }
+   return Product.findByPk(id)
+  }) 
+  .then(e=>{
+    fetchcart.addProduct(e,{through :{quantity:qty}})
+  }).then(g=>res.redirect('/cart'))
+  .catch(e=>console.log('error found while posting cart',e))
+}
+
